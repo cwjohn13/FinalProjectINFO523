@@ -1,0 +1,74 @@
+---
+title:  'Homework 4'
+subtitle: 'INFO 523'
+author:
+- name: Student - Cole Johnson
+  affiliation: Student in the Masters of Data Science Program at University of Arizona
+- name: Instructor -  Cristian Román-Palacios
+  affiliation: School of Information, University of Arizona, Tucson, AZ
+tags: [R, RStudio, HW4]
+output: html_document
+---
+
+```{r Data simulation}
+df <- as.data.frame(matrix(round(runif(n = 3000, min = 1, max = 3), 0), nrow = 1000))
+names(df) <- c('Process1','Process2','Process3')
+df$ParticleCount <- rnorm(1000, mean = 8, sd = 4)
+df$ThicknessVariation <- rnorm(1000, mean = 0.8, sd = 0.3)
+```
+```{r load libraries}
+library(tidyverse)
+```
+```{r Data Analysis}
+df1 <- df |>
+  mutate(ProcessCombination = paste(Process1, Process2, Process3, sep = ",")) |>
+  group_by(ProcessCombination) |>
+  summarise(MeanParticleCount = mean(ParticleCount), SDParticleCount = sd(ParticleCount), MeanThicknessVariation = mean(ThicknessVariation), SDThicknessVariation = sd(ThicknessVariation))  |>
+  ungroup()
+
+dfspec1 <- df1 |>
+  mutate(ParticleYield = pnorm(25, mean = MeanParticleCount, sd = SDParticleCount)) |>
+  mutate(ThicknessYield = pnorm(2, mean = MeanThicknessVariation, sd = SDThicknessVariation)) |>
+  mutate(TotalProcessYield = ParticleYield*ThicknessYield) |>
+  mutate(TotalExpectedYield = pnorm(25,mean = 8, sd = 4)*pnorm(2, mean = 0.8, sd = 0.3))
+dfspec1 <- head(dfspec1[order(-dfspec1$TotalProcessYield),],10)
+dfspec1 <- dfspec1 |>
+  select(ProcessCombination, TotalProcessYield, TotalExpectedYield) |>
+  mutate(YieldDifference = TotalProcessYield-TotalExpectedYield)
+dfspec1
+
+dfspec2 <- df1 |>
+  mutate(ParticleYield = pnorm(16, mean = MeanParticleCount, sd = SDParticleCount)) |>
+  mutate(ThicknessYield = pnorm(2, mean = MeanThicknessVariation, sd = SDThicknessVariation)) |>
+  mutate(TotalProcessYield = ParticleYield*ThicknessYield) |>
+  mutate(TotalExpectedYield = pnorm(16,mean = 8, sd = 4)*pnorm(2, mean = 0.8, sd = 0.3))
+dfspec2 <- head(dfspec2[order(-dfspec2$TotalProcessYield),],3)
+dfspec2 <- dfspec2 |>
+  select(ProcessCombination, TotalProcessYield, TotalExpectedYield) |>
+  mutate(YieldDifference = TotalProcessYield-TotalExpectedYield)
+dfspec2
+
+dfspec3 <- df1 |>
+  mutate(ParticleYield = pnorm(25, mean = MeanParticleCount, sd = SDParticleCount)) |>
+  mutate(ThicknessYield = pnorm(1.3, mean = MeanThicknessVariation, sd = SDThicknessVariation)) |>
+  mutate(TotalProcessYield = ParticleYield*ThicknessYield) |>
+  mutate(TotalExpectedYield = pnorm(25,mean = 8, sd = 4)*pnorm(1.3, mean = 0.8, sd = 0.3))
+dfspec3 <- head(dfspec3[order(-dfspec3$TotalProcessYield),],3)
+dfspec3 <- dfspec3 |>
+  select(ProcessCombination, TotalProcessYield, TotalExpectedYield) |>
+  mutate(YieldDifference = TotalProcessYield-TotalExpectedYield)
+dfspec3
+
+dfspec4 <- df1 |>
+  mutate(ParticleYield = pnorm(16, mean = MeanParticleCount, sd = SDParticleCount)) |>
+  mutate(ThicknessYield = pnorm(1.3, mean = MeanThicknessVariation, sd = SDThicknessVariation)) |>
+  mutate(TotalProcessYield = ParticleYield*ThicknessYield) |>
+  mutate(TotalExpectedYield = pnorm(16,mean = 8, sd = 4)*pnorm(1.3, mean = 0.8, sd = 0.3))
+dfspec4 <- head(dfspec4[order(-dfspec4$TotalProcessYield),],3)
+dfspec4 <- dfspec4 |>
+  select(ProcessCombination, TotalProcessYield, TotalExpectedYield) |>
+  mutate(YieldDifference = TotalProcessYield-TotalExpectedYield)
+dfspec4
+
+
+```
